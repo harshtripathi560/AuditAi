@@ -415,6 +415,24 @@
                     <span class="risk-score-val">{{ report.risk_score }}</span>
                     <span class="risk-label">RISK SCORE</span>
                 </div>
+
+                {% if request.args.get('repaired') == 'true' %}
+                <div class="repair-success"
+                    style="margin-top: 20px; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 15px; border-radius: 12px;">
+                    <div
+                        style="color: #166534; font-weight: 700; font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <span>✅</span> System Successfully Retrained
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="/download/model" class="btn btn-green"
+                            style="font-size: 0.8rem; width: 100%; justify-content: center;">📥 Download Fixed Model</a>
+                        <a href="/download/data" class="btn btn-green"
+                            style="font-size: 0.8rem; width: 100%; justify-content: center;">📊 Download Cleaned
+                            Data</a>
+                    </div>
+                </div>
+                {% endif %}
+
                 {% if report.status != 'PASS' %}
                 <div
                     style="margin-top: 20px; text-align: center; border-top: 1px solid var(--border-ui); padding-top: 15px;">
@@ -473,6 +491,24 @@
                     <h3 class="card-title">Confidence Trend</h3>
                 </div>
                 <div class="chart-container"><canvas id="confidenceChart"></canvas></div>
+                <div class="chart-conclusion"
+                    style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-ui);">
+                    <h4
+                        style="font-size: 0.8rem; font-weight: 700; color: var(--secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+                        AI Insights: Graph Interpretation</h4>
+                    <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-muted);">
+                        {% if report.status == 'PASS' %}
+                        The confidence trend is stable. The model is operating within its "Safe Zone" with consistent
+                        certainty in its predictions. No significant fluctuations detected.
+                        {% elif report.status == 'WARNING' %}
+                        The graph indicates high variance or slight downward trends. This suggests that some incoming
+                        data is unfamiliar to the model, causing its certainty to flicker.
+                        {% else %}
+                        CRITICAL: The confidence levels are either highly unstable or significantly low. This pattern is
+                        a classic sign of model degradation or a massive shift in the real-world data patterns.
+                        {% endif %}
+                    </p>
+                </div>
             </div>
         </div>
     </div>

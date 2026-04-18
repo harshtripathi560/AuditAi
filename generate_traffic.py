@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
+from sklearn.ensemble import RandomForestClassifier
 
 # Use absolute paths because we are inside a package
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,8 +40,19 @@ def generate_mock_traffic(scenario='mixed', clear_logs=False):
     degraded_path = os.path.join(MODELS_DIR, 'degraded_model.pkl')
     
     if not os.path.exists(healthy_path) or not os.path.exists(degraded_path):
-        print(f"CRITICAL: Models not found at {MODELS_DIR}!")
-        return
+        print("Models missing. Creating dummy models for simulation...")
+        X_dummy = np.random.normal(0.5, 0.1, size=(100, 5))
+        y_h = (X_dummy.sum(axis=1) > 2.5).astype(int)
+        
+        m_h = RandomForestClassifier(n_estimators=5, random_state=42)
+        m_h.fit(X_dummy, y_h)
+        joblib.dump(m_h, healthy_path)
+        
+        m_d = RandomForestClassifier(n_estimators=5, random_state=42)
+        y_d = (X_dummy[:, 0] > 0.4).astype(int) # Biased
+        m_d.fit(X_dummy, y_d)
+        joblib.dump(m_d, degraded_path)
+        print("Dummy models created.")
 
     model_healthy = joblib.load(healthy_path)
     model_degraded = joblib.load(degraded_path)

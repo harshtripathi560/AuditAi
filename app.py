@@ -112,7 +112,7 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = user.name
             flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('upload'))
         else:
             print("DEBUG: Password match failed or user NOT found")
             flash('Invalid email or password.', 'error')
@@ -251,15 +251,25 @@ def upload():
                 print(f"DEBUG: Error logging row {i}: {log_err}")
                 continue
             
-        # 6. UPDATE BASELINE
+        # 6. UPDATE BASELINE (Include target for retraining)
         ref_path = os.path.join(MODELS_DIR, 'reference_data.csv')
-        df_ref = X.head(100).copy() # Use X (features only)
-        # Standardize column names for the tools (f0, f1...)
-        df_ref.columns = [f'f{j}' for j in range(len(df_ref.columns))]
-        df_ref.to_csv(ref_path, index=False)
-        print(f"DEBUG: Updated baseline reference at {ref_path}")
+        df_ref = df.head(100).copy() 
+        # Identify and normalize columns
+        feature_cols = [c for c in df_ref.columns if c != actual_target_col]
+        renamed_cols = {col: f'f{i}' for i, col in enumerate(feature_cols)}
+        if actual_target_col:
+            renamed_cols[actual_target_col] = 'target'
         
-        return redirect(url_for('home'))
+        df_ref = df_ref.rename(columns=renamed_cols)
+        # Ensure we only keep normalized columns
+        final_cols = [f'f{i}' for i in range(len(feature_cols))]
+        if actual_target_col:
+            final_cols.append('target')
+            
+        df_ref[final_cols].to_csv(ref_path, index=False)
+        print(f"DEBUG: Updated baseline reference (with target) at {ref_path}")
+        
+        return redirect(url_for('dashboard'))
         
     except Exception as e:
         import traceback
@@ -283,7 +293,7 @@ def repair():
         # just regenerate healthy traffic to prove it works.
         # For demo: We generate healthy traffic immediately to simulate "After-Repair" state
         generate_mock_traffic(scenario='healthy', clear_logs=True)
-        return redirect(url_for('home', repaired='true'))
+        return redirect(url_for('dashboard', repaired='true'))
     else:
         return "Repair Failed", 500
 

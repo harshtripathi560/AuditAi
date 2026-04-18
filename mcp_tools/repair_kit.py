@@ -48,6 +48,9 @@ def perform_auto_repair(target_data_path=None):
     
     # 3. RETRAIN MODEL
     print("🔄 Retraining Model on Cleaned Data...")
+    if 'target' not in df_clean.columns:
+        return {"success": False, "error": "Target column missing from reference data. Please re-upload your dataset."}
+        
     X = df_clean.drop('target', axis=1)
     y = df_clean['target']
     
