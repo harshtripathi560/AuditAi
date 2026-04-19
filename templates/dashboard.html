@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP AI Auditor | Pro Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --primary: #818CF8;
+            --primary-glow: rgba(129, 140, 248, 0.15);
+            --secondary: #94A3B8;
+            --success: #10B981; /* Keep text-safe colors for icons/status */
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg-body: #F9FAFB;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --sidebar-width: 280px;
+            --border-ui: #E5E7EB;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #FFFFFF;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            border-right: 1px solid var(--border-ui);
+        }
+
+        .brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item {
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background: #F3F4F6;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .config-box {
+            margin-top: auto;
+            background: #F9FAFB;
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--border-ui);
+        }
+
+        .config-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-ui);
+            border-radius: 10px;
+            outline: none;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            flex: 1;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-ui);
+            padding-bottom: 20px;
+        }
+
+        .page-title h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.03em;
+        }
+
+        .page-title p {
+            margin: 8px 0 0;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .scenario-controls {
+            display: flex;
+            gap: 12px;
+            background: white;
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            align-items: center;
+        }
+
+        .control-label {
+            padding: 0 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-green {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .btn-green:hover {
+            background: #BBF7D0;
+            color: #14532D;
+        }
+
+        .btn-red {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .btn-red:hover {
+            background: #FECACA;
+            color: #7F1D1D;
+        }
+
+        /* GRID */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-ui);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 28px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+        /* RISK SCORE */
+        .risk-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            border: 12px solid;
+            position: relative;
+            background: #F9FAFB;
+        }
+
+        .risk-score-val {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .risk-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .status-CRITICAL .risk-circle {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .status-WARNING .risk-circle {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .status-PASS .risk-circle {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* EXPLAINER */
+        .gemini-box {
+            background: linear-gradient(135deg, #1E1B4B 0%, #4F46E5 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            line-height: 1.7;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .gemini-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        /* ISSUES */
+        .issue-item {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .issue-warning {
+            background: #FFF7ED;
+            border-left: 4px solid #F97316;
+            color: #9A3412;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            background: #F0FDF4;
+            border-radius: 12px;
+            color: #166534;
+            font-weight: 600;
+        }
+
+        /* METRICS */
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .stat-lbl {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .text-danger {
+            color: var(--danger) !important;
+        }
+
+        /* CHART */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="brand">⚡ MCP Auditor</div>
+        <a href="/dashboard" class="nav-item active"><span>🏠</span> Dashboard</a>
+        <a href="/upload" class="nav-item"><span>📤</span> Upload System</a>
+        <a href="#" class="nav-item"><span>📄</span> Audit Logs</a>
+        <a href="#" class="nav-item"><span>⚙️</span> Settings</a>
+
+        <div class="config-box">
+            <span class="config-label">Agent Config</span>
+            <form id="configForm" action="/" method="GET">
+                <label style="color:#9CA3AF; font-size:0.85rem; display:block; margin-bottom:5px;">Sensitivity</label>
+                <select name="sensitivity" onchange="document.getElementById('configForm').submit()">
+                    <option value="Low" {% if request.args.get('sensitivity')=='Low' %}selected{% endif %}>Low
+                        (Permissive)</option>
+                    <option value="Medium" {% if not request.args.get('sensitivity') or
+                        request.args.get('sensitivity')=='Medium' %}selected{% endif %}>Medium (Standard)</option>
+                    <option value="High" {% if request.args.get('sensitivity')=='High' %}selected{% endif %}>High
+                        (Strict)</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="page-title">
+                <h1>Self-Auditing Monitor</h1>
+                <p>Live AI System Health Check</p>
+            </div>
+            <div class="scenario-controls">
+                <span class="control-label">Inject Scenario:</span>
+                <a href="/simulate/healthy" class="btn btn-green">✅ Healthy</a>
+                <a href="/simulate/risky" class="btn btn-red">⚠️ Risky (Biased)</a>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card status-{{ report.status }}">
+                <div class="card-header">
+                    <h3 class="card-title">System Status</h3>
+                    <span style="font-weight:bold; color:var(--text-muted)">{{ report.status }}</span>
+                </div>
+                <div class="risk-circle">
+                    <span class="risk-score-val">{{ report.risk_score }}</span>
+                    <span class="risk-label">RISK SCORE</span>
+                </div>
+
+                {% if request.args.get('repaired') == 'true' %}
+                <div class="repair-success"
+                    style="margin-top: 20px; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 15px; border-radius: 12px;">
+                    <div
+                        style="color: #166534; font-weight: 700; font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <span>✅</span> System Successfully Retrained
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="/download/model" class="btn btn-green"
+                            style="font-size: 0.8rem; width: 100%; justify-content: center;">📥 Download Fixed Model</a>
+                        <a href="/download/data" class="btn btn-green"
+                            style="font-size: 0.8rem; width: 100%; justify-content: center;">📊 Download Cleaned
+                            Data</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if report.status != 'PASS' %}
+                <div
+                    style="margin-top: 20px; text-align: center; border-top: 1px solid var(--border-ui); padding-top: 15px;">
+                    <a href="/repair" class="btn btn-red" style="width: 100%; justify-content: center;">🔧 Auto-Repair
+                        System</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="card" style="padding:0; border:none; overflow:hidden;">
+                <div class="gemini-box">
+                    <div class="gemini-header">✨ AI Explanation</div>
+                    <div style="font-size: 0.95rem; opacity: 0.9;">
+                        {% if explanation %}{{ explanation | safe }}{% else %}Analyzing data streams...{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-3">
+            <div class="card">
+                <div class="stat-item">
+                    <div class="stat-val">{{ "%.2f"|format(report.metrics.health.get('avg_confidence', 0)) }}</div>
+                    <div class="stat-lbl">Avg Confidence</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat-item">
+                    <div class="stat-val">{{ "%.1f"|format(report.metrics.health.get('estimated_accuracy', 0) * 100) if
+                        report.metrics.health.get('estimated_accuracy') is not none else '0.0' }}%</div>
+                    <div class="stat-lbl">Est. Accuracy</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat-item">
+                    <div class="stat-val {{ 'text-danger' if report.metrics.fail_rate > 0.4 else '' }}">{{
+                        "%.1f"|format(report.metrics.fail_rate * 100) }}%</div>
+                    <div class="stat-lbl">Class 1 Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2" style="grid-template-columns: 1fr 2fr;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Detected Issues</h3>
+                </div>
+                {% if report.issues %}
+                {% for issue in report.issues %}<div class="issue-item issue-warning">⚠️ {{ issue }}</div>{% endfor %}
+                {% else %}
+                <div class="empty-state">✅ All Systems Healthy</div>
+                {% endif %}
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Confidence Trend</h3>
+                </div>
+                <div class="chart-container"><canvas id="confidenceChart"></canvas></div>
+                <div class="chart-conclusion"
+                    style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-ui);">
+                    <h4
+                        style="font-size: 0.8rem; font-weight: 700; color: var(--secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+                        AI Insights: Graph Interpretation</h4>
+                    <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-muted);">
+                        {% if report.status == 'PASS' %}
+                        The confidence trend is stable. The model is operating within its "Safe Zone" with consistent
+                        certainty in its predictions. No significant fluctuations detected.
+                        {% elif report.status == 'WARNING' %}
+                        The graph indicates high variance or slight downward trends. This suggests that some incoming
+                        data is unfamiliar to the model, causing its certainty to flicker.
+                        {% else %}
+                        CRITICAL: The confidence levels are either highly unstable or significantly low. This pattern is
+                        a classic sign of model degradation or a massive shift in the real-world data patterns.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="chart-data" type="application/json">
+        {{ chart_data | tojson | safe }}
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                const chartData = JSON.parse(document.getElementById('chart-data').textContent);
+                if (!chartData || !chartData.labels || chartData.labels.length === 0) return;
+        const ctx = document.getElementById('confidenceChart').getContext('2d');
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
+        gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Model Confidence',
+                    data: chartData.confidence,
+                    borderColor: '#4F46E5',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 1.0, grid: { color: '#F3F4F6' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+            } catch (e) { console.error("Chart Error:", e); }
+        });
+    </script>
+</body>
+
+</html>
