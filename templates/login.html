@@ -6,77 +6,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Monitor - Login</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <style>
-body {
-    background: radial-gradient(circle at center, #F5F3FF 0%, #F9FAFB 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.auth-box {
-    width: 100%;
-    max-width: 450px;
-    padding: 60px;
-    background: #FFFFFF;
-    border-radius: 30px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-ui);
-}
-
-.auth-box h2 {
-    text-align: center;
-    font-size: 2.2rem;
-    margin-bottom: 40px;
-    font-weight: 800;
-}
-
-.input-group {
-    margin-bottom: 25px;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 16px 20px;
-    border: 1px solid var(--border-ui);
-    border-radius: 12px;
-    outline: none;
-    background: #F9FAFB;
-    color: var(--text-main);
-    font-size: 1rem;
-    transition: all 0.2s;
-}
-
-.input-group input:focus {
-    border-color: var(--primary);
-    background: #FFFFFF;
-    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
-}
-
-.toggle {
-    margin-top: 30px;
-    text-align: center;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.toggle a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.flash-messages { margin-bottom: 30px; }
-.flash { padding: 15px; border-radius: 12px; font-size: 0.9rem; margin-bottom: 12px; text-align: center; font-weight: 600; }
-.flash.success { background: #D1FAE5; color: #065F46; }
-.flash.error { background: #FEE2E2; color: #991B1B; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI, sans-serif;}
+body{background:#0b1120;color:white;overflow-x:hidden;}
+canvas{position:fixed;top:0;left:0;z-index:0;}
+.container{position:relative;z-index:2;width:100%;height:100vh;display:flex;justify-content:center;align-items:center;}
+.auth-box{width:480px;padding:50px;border-radius:25px;background:rgba(255,255,255,0.05);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 50px rgba(0,0,0,0.6);}
+.auth-box h2{text-align:center;margin-bottom:30px;background:linear-gradient(90deg,#6366f1,#ec4899,#06b6d4);background-size:200%;color:transparent;background-clip:text;-webkit-background-clip:text;animation:gradient 4s linear infinite;}
+@keyframes gradient{0%{background-position:0%}100%{background-position:200%}}
+.input-group{margin-bottom:20px;}
+.input-group input{width:100%;padding:14px;border:none;border-radius:10px;outline:none;background:rgba(255,255,255,0.08);color:white;font-size:14px;}
+.btn{width:100%;padding:14px;border:none;border-radius:30px;cursor:pointer;color:white;font-size:16px;background:linear-gradient(90deg,#6366f1,#ec4899,#06b6d4);background-size:200%;animation:gradient 4s linear infinite;transition:0.4s;}
+.btn:hover{transform:scale(1.05);box-shadow:0 0 20px #6366f1;}
+.toggle{margin-top:20px;text-align:center;color:#cbd5e1;}
+.toggle a{color:#ec4899;text-decoration:none;}
+.flash-messages { margin-bottom: 20px; }
+.flash { padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 10px; text-align: center; }
+.flash.success { background: rgba(76, 175, 80, 0.2); border: 1px solid #4caf50; color: #4caf50; }
+.flash.error { background: rgba(244, 67, 54, 0.2); border: 1px solid #f44336; color: #f44336; }
 </style>
 </head>
 <body>
 
+<canvas id="particles"></canvas>
+
+<div class="container">
 <div class="auth-box">
 
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -89,7 +43,7 @@ body {
   {% endif %}
 {% endwith %}
 
-<h2 class="text-gradient">Login</h2>
+<h2>Login</h2>
 <form method="POST" action="/login">
 <div class="input-group">
 <input type="email" name="email" placeholder="Email" required>
@@ -97,7 +51,7 @@ body {
 <div class="input-group">
 <input type="password" name="password" placeholder="Password" required>
 </div>
-<button class="btn btn-primary" style="width: 100%;" type="submit">Login</button>
+<button class="btn" type="submit">Login</button>
 </form>
 
 <div class="toggle">
@@ -105,6 +59,18 @@ Don't have an account? <a href="/register">Register</a>
 </div>
 
 </div>
+</div>
+
+<script>
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+let particles=[];
+class Particle{constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*3;this.speedX=(Math.random()-0.5)*0.5;this.speedY=(Math.random()-0.5)*0.5;}update(){this.x+=this.speedX;this.y+=this.speedY;if(this.x<0||this.x>canvas.width)this.speedX*=-1;if(this.y<0||this.y>canvas.height)this.speedY*=-1;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle="rgba(99,102,241,0.7)";ctx.fill();}}
+function init(){for(let i=0;i<100;i++){particles.push(new Particle());}}
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animate);}init();animate();
+</script>
 
 </body>
 </html>

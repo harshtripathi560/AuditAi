@@ -7,16 +7,15 @@
     <title>MCP AI Auditor | Pro Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         :root {
-            --primary: #818CF8;
-            --primary-glow: rgba(129, 140, 248, 0.15);
-            --secondary: #94A3B8;
-            --success: #10B981; /* Keep text-safe colors for icons/status */
+            --primary: #4F46E5;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --secondary: #64748B;
+            --success: #10B981;
             --warning: #F59E0B;
             --danger: #EF4444;
-            --bg-body: #F9FAFB;
+            --bg-body: #F3F4F6;
             --bg-card: #FFFFFF;
             --text-main: #1F2937;
             --text-muted: #6B7280;
@@ -24,85 +23,93 @@
             --border-ui: #E5E7EB;
         }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
+            font-family: 'Outfit', sans-serif;
             background-color: var(--bg-body);
             color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
         }
 
         /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-width);
-            background: #FFFFFF;
-            padding: 40px 30px;
+            background: #111827;
+            padding: 30px;
             display: flex;
             flex-direction: column;
             position: fixed;
             height: 100vh;
             z-index: 1000;
-            border-right: 1px solid var(--border-ui);
         }
 
         .brand {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 50px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #818CF8;
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
         .nav-item {
-            padding: 14px 20px;
+            padding: 14px 18px;
             border-radius: 12px;
-            margin-bottom: 12px;
-            color: var(--text-muted);
+            margin-bottom: 10px;
+            color: #9CA3AF;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .nav-item:hover {
-            background: #F3F4F6;
-            color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
         .nav-item.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
 
         .config-box {
             margin-top: auto;
-            background: #F9FAFB;
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid var(--border-ui);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .config-label {
             font-size: 0.75rem;
             text-transform: uppercase;
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: 0.05em;
-            color: var(--text-light);
-            margin-bottom: 15px;
+            color: #9CA3AF;
+            margin-bottom: 12px;
             display: block;
         }
 
         select {
             width: 100%;
-            padding: 12px;
-            background: white;
-            color: var(--text-main);
-            border: 1px solid var(--border-ui);
-            border-radius: 10px;
+            padding: 10px;
+            background: #1F2937;
+            color: white;
+            border: 1px solid #374151;
+            border-radius: 8px;
             outline: none;
             font-family: inherit;
-            font-weight: 500;
         }
 
         /* MAIN CONTENT */
@@ -364,7 +371,7 @@
 <body>
     <div class="sidebar">
         <div class="brand">⚡ MCP Auditor</div>
-        <a href="/dashboard" class="nav-item active"><span>🏠</span> Dashboard</a>
+        <a href="/" class="nav-item active"><span>🏠</span> Dashboard</a>
         <a href="/upload" class="nav-item"><span>📤</span> Upload System</a>
         <a href="#" class="nav-item"><span>📄</span> Audit Logs</a>
         <a href="#" class="nav-item"><span>⚙️</span> Settings</a>
@@ -506,14 +513,12 @@
         </div>
     </div>
 
-    <script id="chart-data" type="application/json">
-        {{ chart_data | tojson | safe }}
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             try {
-                const chartData = JSON.parse(document.getElementById('chart-data').textContent);
-                if (!chartData || !chartData.labels || chartData.labels.length === 0) return;
+                const chartData = {{ chart_data | tojson
+            }};
+        if (!chartData || !chartData.labels || chartData.labels.length === 0) return;
         const ctx = document.getElementById('confidenceChart').getContext('2d');
         let gradient = ctx.createLinearGradient(0, 0, 0, 300);
         gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
