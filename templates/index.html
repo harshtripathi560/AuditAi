@@ -2,166 +2,47 @@
 <html>
 <head>
     <title>AI Monitored Agent</title>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<style>
 
-body{
-    margin:0;
-    font-family:'Jost', sans-serif;
-    background: radial-gradient(circle at top, #1a1a2e, #0f0c29 70%);
-    color:white;
-    overflow-x:hidden;
-}
-
-/* ===== PARTICLE CANVAS ===== */
-#particles-js{
-    position:fixed;
-    width:100%;
-    height:100%;
-    z-index:-1;
-}
-
-/* ===== NAVBAR ===== */
-nav{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 60px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(15px);
-}
-
-nav h2{
-    font-weight:700;
-    background: linear-gradient(45deg,#ff4b7d,#6c63ff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-nav ul{
-    list-style:none;
-    display:flex;
-    gap:30px;
-}
-
-nav ul li a{
-    text-decoration:none;
-    color:white;
-    font-weight:500;
-    transition:0.3s;
-}
-
-nav ul li a:hover{
-    color:#ff4b7d;
-}
-
-/* ===== HERO ===== */
-.hero{
-    text-align:center;
-    margin-top:120px;
-}
-
-.hero h1{
-    font-size:50px;
-    background: linear-gradient(45deg,#ff4b7d,#6c63ff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float{
-    0%{transform:translateY(0px);}
-    50%{transform:translateY(-10px);}
-    100%{transform:translateY(0px);}
-}
-
-.hero p{
-    opacity:0.8;
-    margin-top:10px;
-    font-size:18px;
-}
-
-/* BUTTON */
-.btn{
-    background: linear-gradient(45deg,#ff4b7d,#6c63ff);
-    padding:14px 35px;
-    border-radius:30px;
-    text-decoration:none;
-    color:white;
-    display:inline-block;
-    margin-top:30px;
-    transition:0.3s;
-    box-shadow:0 0 15px rgba(255,75,125,0.6);
-}
-
-.btn:hover{
-    transform:scale(1.08);
-    box-shadow:0 0 25px rgba(108,99,255,0.9);
-}
-
-/* ===== FEATURES ===== */
-.features{
-    display:flex;
-    justify-content:center;
-    gap:40px;
-    margin:120px 0;
-    flex-wrap:wrap;
-}
-
-.card{
-    width:260px;
-    padding:30px;
-    border-radius:20px;
-    background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(20px);
-    box-shadow:0 10px 30px rgba(0,0,0,0.6);
-    transition:0.4s;
-}
-
-.card:hover{
-    transform:translateY(-12px);
-    background: rgba(255,255,255,0.12);
-}
-
-</style>
 </head>
 
-<body>
+<body class="page-index">
 
 <div id="particles-js"></div>
 
 <nav>
-    <h2>AI Agent</h2>
+    <h2 class="text-gradient">AuditAi</h2>
     <ul>
         <li><a href="/">Home</a></li>
         <li><a href="#">About</a></li>
-        <li><a href="#">Services</a></li>
         <li><a href="/login">Login</a></li>
+        <li><a href="/register" class="btn btn-primary" style="padding: 8px 20px;">Sign Up</a></li>
     </ul>
 </nav>
 
 <section class="hero">
-    <h1>AI Monitored Intelligent Agent</h1>
-    <p>Secure • Smart • Automated Monitoring System</p>
-    <a href="/login" class="btn">Get Started</a>
+    <h1 class="text-gradient">AI Monitored Intelligent Agent</h1>
+    <p>Elegant, Secure, and Automated Monitoring for your Intelligent Systems.</p>
+    <a href="/login" class="btn btn-primary btn-lg" style="font-size: 1.1rem; padding: 15px 40px;">Get Started</a>
 </section>
 
 <section class="features">
     <div class="card">
         <h3>Real-time Monitoring</h3>
-        <p>Track activities instantly using AI intelligence.</p>
+        <p>Track activities instantly using advanced AI intelligence and pastel-perfect clarity.</p>
     </div>
 
     <div class="card">
         <h3>Advanced Security</h3>
-        <p>Encrypted & protected data architecture.</p>
+        <p>Encrypted and protected data architecture designed for reliability and speed.</p>
     </div>
 
     <div class="card">
         <h3>Smart Alerts</h3>
-        <p>Instant notifications powered by AI logic.</p>
+        <p>Instant notifications powered by AI logic to keep you informed at every step.</p>
     </div>
 </section>
 
